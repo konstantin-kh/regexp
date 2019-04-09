@@ -24,15 +24,22 @@
 }
 
 .App-form{
+    padding: 4em 0;
+}
+
+.App-form .input-wrap{
   display: flex;
   flex-wrap: wrap;
-  padding: 4em 0;
-  margin: 0 -5px;
+  margin: 0 -5px 15px;
   font-size: 20px;
 }
 
-.App-form > * {
+.App-form .input-wrap > * {
   margin: 0 5px;
+}
+
+.App-form .result{
+  text-align: left;
 }
 
 

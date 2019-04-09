@@ -9,7 +9,7 @@ class App extends Component {
 		this.state = {
 			stringValue: '',
 			regexValue: '',
-			matched: ''
+			matched: []
 		};
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleInputChange = this.handleInputChange.bind(this);
@@ -32,32 +32,56 @@ class App extends Component {
 		});
 	}
 
+	getAllMatches(text, regex) {
+		let clearRegex = new RegExp(regex, 'g');
+
+		if (clearRegex.constructor !== RegExp) {
+			throw new Error('not RegExp');
+		}
+
+		let resArray = [];
+		let match = null;
+
+		if (clearRegex.global) {
+			while ((match = clearRegex.exec(text)) !== null) {
+				resArray.push(match);
+			}
+		}
+
+		return resArray;
+	}
+
 	handleSubmit(e) {
 		e.preventDefault();
+
 		let string = this.state.stringValue;
 		let reg = this.state.regexValue;
-		let found = RegExp(reg);
-		let res = found.test(string);
+		let self = this;
+		let resItems = this.state.matched;
 
+		if (!string && !reg) return;
 
-		console.log(string);
-		console.log(reg);
-		console.log(res);
-
-		// let found = string.match(reg);
-
-		if (res === false || !(string && reg)) {
-			this.setState({
-				matched: 'not matches'
-			})
-		} else {
-			this.setState({
-				matched: 'true'
-			})
-		}
+		let res = this.getAllMatches(string, reg);
+		
+		res.forEach((item) => {
+			console.log(item);
+			
+			resItems.push(item)
+			self.setState({
+				matched: resItems
+			});
+		});
 	}
 
 	render() {
+		let matchedItems = this.state.matched.map((item, index) => {
+			return item.map((list, index) => {
+				return <div key={index}>
+						<span>Group {index + 1}.</span> <span>{item[0]} : </span><mark>{list}</mark>
+					</div>
+			});
+		});
+
 		return (
 			<div className="App">
 				<header className="App-header">
@@ -65,18 +89,20 @@ class App extends Component {
 				</header>
 				<main>
 					<form className="App-form" onSubmit={this.handleSubmit}>
-						< input type = "text"
-							placeholder = "string"
-							value = {this.state.stringValue}
-							onChange = {this.handleInputChange}
-						/>
-						< input type = "text"
-							placeholder = "regex"
-							value = {this.state.regexValue}
-							onChange = {this.handleInputRegex}
-						/>
-						<button type="submit">Match</button>
-						<div className="result">Found: {this.state.matched}</div>
+						<div className="input-wrap">
+							< input type = "text"
+								placeholder = "string"
+								value = {this.state.stringValue}
+								onChange = {this.handleInputChange}
+							/>
+							< input type = "text"
+								placeholder = "regex"
+								value = {this.state.regexValue}
+								onChange = {this.handleInputRegex}
+							/>
+							<button type="submit">Match</button>
+						</div>
+						<div className="result"><strong>Found:</strong>{matchedItems}</div>
 					</form>
 				</main>
 			</div>
